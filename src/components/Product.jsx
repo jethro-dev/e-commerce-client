@@ -5,6 +5,7 @@ import {
   SearchOutlined,
   FavoriteBorderOutlined,
 } from "@mui/icons-material";
+import { Link } from "react-router-dom";
 
 const Info = styled.div`
   width: 100%;
@@ -29,7 +30,7 @@ const Container = styled.div`
   display: flex;
   justify-content: center;
   align-items: center;
-  background-color: #f5fbfd;
+  background-color: #f3f3f3;
   position: relative;
 
   &:hover ${Info} {
@@ -70,7 +71,7 @@ const Icon = styled.div`
   }
 `;
 
-const Product = ({ img }) => {
+const Product = ({ img, _id }) => {
   return (
     <Container>
       <Circle />
@@ -80,7 +81,9 @@ const Product = ({ img }) => {
           <ShoppingCartOutlined />
         </Icon>
         <Icon>
-          <SearchOutlined />
+          <Link to={`/product/${_id}`}>
+            <SearchOutlined sx={{ color: "black" }} />
+          </Link>
         </Icon>
         <Icon>
           <FavoriteBorderOutlined />

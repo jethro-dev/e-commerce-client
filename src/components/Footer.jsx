@@ -100,32 +100,16 @@ const Footer = () => {
         </Description>
         <SocialContainer>
           <SocialIcon color="3B5999">
-            <Facebook
-              sx={mobile({
-                fontSize: "18px",
-              })}
-            />
+            <Facebook />
           </SocialIcon>
           <SocialIcon color="E4405F">
-            <Instagram
-              sx={mobile({
-                fontSize: "18px",
-              })}
-            />
+            <Instagram />
           </SocialIcon>
           <SocialIcon color="55ACEE">
-            <Twitter
-              sx={mobile({
-                fontSize: "18px",
-              })}
-            />
+            <Twitter />
           </SocialIcon>
           <SocialIcon color="E60023">
-            <Pinterest
-              sx={mobile({
-                fontSize: "18px",
-              })}
-            />
+            <Pinterest />
           </SocialIcon>
         </SocialContainer>
       </Left>

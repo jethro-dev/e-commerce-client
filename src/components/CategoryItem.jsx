@@ -1,4 +1,5 @@
 import React, { useState } from "react";
+import { Link } from "react-router-dom";
 import styled from "styled-components";
 import { mobile } from "../responsive";
 
@@ -58,7 +59,7 @@ const Button = styled.button`
   }
 `;
 
-const CategoryItem = ({ img, title }) => {
+const CategoryItem = ({ img, title, category }) => {
   const [isHover, setIsHover] = useState(false);
   const handleHover = (e) => {
     setIsHover(true);
@@ -69,11 +70,13 @@ const CategoryItem = ({ img, title }) => {
 
   return (
     <Container onMouseOver={handleHover} onMouseLeave={handleLeave}>
-      <Image src={img} isHover={isHover} />
-      <Info isHover={isHover}>
-        <Title>{title}</Title>
-        <Button>SHOP NOW</Button>
-      </Info>
+      <Link to={`/products/${category}`}>
+        <Image src={img} isHover={isHover} />
+        <Info isHover={isHover}>
+          <Title>{title}</Title>
+          <Button>SHOP NOW</Button>
+        </Info>
+      </Link>
     </Container>
   );
 };

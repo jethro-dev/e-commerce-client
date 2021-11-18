@@ -1,8 +1,13 @@
 import { Add, Remove } from "@mui/icons-material";
-import React from "react";
+import { IconButton } from "@mui/material";
+import React, { useState, useEffect } from "react";
 import styled from "styled-components";
 import { Announcement, Footer, Navbar, Newsletter } from "../components";
 import { mobile } from "../responsive";
+import { useLocation } from "react-router-dom";
+import axios from "../axios";
+import { addProduct } from "../redux/cartRedux";
+import { useDispatch } from "react-redux";
 
 const Wrapper = styled.div`
   padding: 50px;
@@ -42,7 +47,7 @@ const Price = styled.p`
 
 const FilterContainer = styled.div`
   width: 50%;
-  margin: 30px 0px;
+  margin: 30px 0 15px;
   display: flex;
   justify-content: space-between;
   ${mobile({ width: "100%" })}
@@ -64,8 +69,13 @@ const FilterColor = styled.div`
   height: 20px;
   border-radius: 50%;
   background-color: ${({ color }) => color};
-  margin-left: 5px;
+  margin: 5px;
   cursor: pointer;
+  border: lightgray 1px solid;
+  transition: all 200ms ease-in-out;
+  &:hover {
+    transform: scale(1.3);
+  }
 `;
 
 const Select = styled.select`
@@ -73,6 +83,12 @@ const Select = styled.select`
 `;
 
 const Option = styled.option``;
+
+const ErrorMessage = styled.p`
+  color: red;
+  margin-top: 15px;
+  text-decoration: underline;
+`;
 
 const AddContainer = styled.div`
   width: 50%;
@@ -85,6 +101,7 @@ const AmountContainer = styled.div`
   display: flex;
   align-items: center;
   font-weight: 700;
+  margin: 30px 0;
 `;
 const Amount = styled.span`
   width: 30px;
@@ -112,48 +129,112 @@ const Button = styled.button`
 `;
 
 const Product = () => {
+  const location = useLocation();
+  const id = location.pathname.split("/")[2];
+  const [product, setProduct] = useState({});
+  const [quantity, setQuantity] = useState(1);
+  const [color, setColor] = useState("");
+  const [size, setSize] = useState("");
+  const [isError, setIsError] = useState(false);
+  const dispatch = useDispatch();
+
+  const handleQuantity = (type) => {
+    switch (type) {
+      case "inc":
+        setQuantity(quantity + 1);
+        break;
+      case "dec":
+        quantity > 1 && setQuantity(quantity - 1);
+        break;
+      default:
+        setQuantity(quantity + 1);
+    }
+  };
+
+  const handleClick = () => {
+    //update cart
+    if (!color || !size) {
+      setIsError(true);
+      return;
+    }
+    dispatch(
+      addProduct({
+        ...product,
+        quantity,
+        color,
+        size,
+      })
+    );
+  };
+
+  useEffect(() => {
+    const getProduct = async () => {
+      try {
+        const res = await axios.get(`/products/find/${id}`);
+        setProduct(res.data);
+      } catch (err) {}
+    };
+
+    getProduct();
+  }, [id]);
+
   return (
     <>
       <Navbar />
       <Announcement />
       <Wrapper>
         <ImgContainer>
-          <Image src="https://i.ibb.co/S6qMxwr/jean.jpg" />
+          <Image src={product.img} />
         </ImgContainer>
         <InfoContainer>
-          <Title>Denim Jumpsuit</Title>
-          <Description>
-            The jumpsuits simplify everyday dressing. This 'Rulebreaker' style
-            is cut from denim blended with a touch of stretch for flexibility
-            and has flared hems which nod to the '70s. Underpin yours with
-            boots.
-          </Description>
-          <Price>$ 20</Price>
+          <Title>{product.title}</Title>
+          <Description>{product.desc}</Description>
+          <Price>$ {product.price}</Price>
           <FilterContainer>
             <Filter>
               <FilterText>Color</FilterText>
-              <FilterColor color="black" />
-              <FilterColor color="darkblue" />
-              <FilterColor color="gray" />
+              {product?.color?.map((c) => (
+                <FilterColor
+                  key={c}
+                  color={c}
+                  onClick={() => setColor(c)}
+                  style={{
+                    border: color === c && "teal 2px solid",
+                  }}
+                />
+              ))}
             </Filter>
             <Filter>
               <FilterText>Size</FilterText>
-              <Select>
-                <Option>XS</Option>
-                <Option>S</Option>
-                <Option>M</Option>
-                <Option>L</Option>
-                <Option>XL</Option>
+              <Select onChange={(e) => setSize(e.target.value)}>
+                <Option value="">Size</Option>
+                {product?.size?.map((size, index) => (
+                  <Option key={index}>{size}</Option>
+                ))}
               </Select>
             </Filter>
           </FilterContainer>
+          {isError && (
+            <ErrorMessage>please select a color and size</ErrorMessage>
+          )}
+
           <AddContainer>
             <AmountContainer>
-              <Remove />
-              <Amount>1</Amount>
-              <Add />
+              <IconButton
+                sx={{ color: "black" }}
+                onClick={() => handleQuantity("dec")}
+              >
+                <Remove />
+              </IconButton>
+              <Amount>{quantity}</Amount>
+              <IconButton
+                sx={{ color: "black" }}
+                onClick={() => handleQuantity("inc")}
+              >
+                <Add />
+              </IconButton>
             </AmountContainer>
-            <Button>ADD TO CART</Button>
+            <Button onClick={handleClick}>ADD TO CART</Button>
           </AddContainer>
         </InfoContainer>
       </Wrapper>

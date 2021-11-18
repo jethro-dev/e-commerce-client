@@ -1,9 +1,13 @@
-import React from "react";
+import React, { useState } from "react";
 import styled from "styled-components";
 import { Announcement, Footer, Navbar } from "../components";
-import { Add, Remove } from "@mui/icons-material";
+import { Add, Clear, Remove } from "@mui/icons-material";
 import { IconButton } from "@mui/material";
 import { mobile } from "../responsive";
+import { useSelector } from "react-redux";
+import { Link } from "react-router-dom";
+import { removeAllProducts, removeProduct } from "../redux/cartRedux";
+import { useDispatch } from "react-redux";
 
 const Wrapper = styled.div`
   padding: 20px;
@@ -72,6 +76,7 @@ const Product = styled.div`
   display: flex;
   justify-content: space-between;
   border-bottom: 1px solid #eee;
+  position: relative;
   ${mobile({ flexDirection: "column" })}
 `;
 const ProductDetail = styled.div`
@@ -112,6 +117,7 @@ const ProductColor = styled.div`
   width: 15px;
   border-radius: 50px;
   background-color: ${({ color }) => color};
+  border: lightgray 1px solid;
 `;
 const ProductSize = styled.span``;
 
@@ -166,7 +172,21 @@ const SummaryButton = styled.button`
   }
 `;
 
+const ClearButton = styled(IconButton)`
+  position: absolute !important;
+  top: 5px !important;
+  right: 1px !important;
+`;
+
 const Cart = () => {
+  const cart = useSelector((state) => state.cart);
+  const dispatch = useDispatch();
+
+  const handleClear = (e) => {
+    console.log(e.currentTarget.value);
+    dispatch(removeProduct(e.currentTarget.value));
+  };
+
   return (
     <>
       <Navbar />
@@ -174,102 +194,96 @@ const Cart = () => {
       <Wrapper>
         <Title>YOUR BAG</Title>
         <Top>
-          <TopButton>CONTINUE SHOPPING</TopButton>
+          <Link to="/">
+            <TopButton>CONTINUE SHOPPING</TopButton>
+          </Link>
           <TopTexts>
             <TopText>Shopping Bag(2)</TopText>
             <TopText>Your Wishlist (0)</TopText>
           </TopTexts>
-          <TopButton type="filled">CHECKOUT NOW</TopButton>
+          {cart.products.length > 0 && (
+            <Link to="/checkout">
+              <TopButton type="filled">CHECKOUT NOW</TopButton>
+            </Link>
+          )}
         </Top>
         <Bottom>
           <Info>
-            <Product>
-              <ProductDetail>
-                <Image src="https://hips.hearstapps.com/vader-prod.s3.amazonaws.com/1614188818-TD1MTHU_SHOE_ANGLE_GLOBAL_MENS_TREE_DASHERS_THUNDER_b01b1013-cd8d-48e7-bed9-52db26515dc4.png?crop=1xw:1.00xh;center,top&resize=480%3A%2A" />
+            {cart.products.map((product, index) => (
+              <Product key={product._id}>
+                <ProductDetail>
+                  <Image src={product.img} />
 
-                <Details>
-                  <ProductName>
-                    <b>Product:</b> JESSIE THUNDER SHOES
-                  </ProductName>
-                  <ProductId>
-                    <b>ID:</b> 93813718293
-                  </ProductId>
-                  <ProductColorText>
-                    Color:
-                    <ProductColor color="black" />
-                  </ProductColorText>
-                  <ProductSize>
-                    <b>Size:</b> 37.5
-                  </ProductSize>
-                </Details>
-              </ProductDetail>
-              <PriceDetail>
-                <ProductAmountContainer>
-                  <IconButton>
-                    <Add />
-                  </IconButton>
-                  <ProductAmount>2</ProductAmount>
-                  <IconButton>
-                    <Remove />
-                  </IconButton>
-                </ProductAmountContainer>
-                <ProductPrice>$ 30</ProductPrice>
-              </PriceDetail>
-            </Product>
-            <Product>
-              <ProductDetail>
-                <Image src="https://i.pinimg.com/originals/2d/af/f8/2daff8e0823e51dd752704a47d5b795c.png" />
-
-                <Details>
-                  <ProductName>
-                    <b>Product:</b> HAKURA T-SHIRT
-                  </ProductName>
-                  <ProductId>
-                    <b>ID:</b> 93813718293
-                  </ProductId>
-                  <ProductColorText>
-                    Color:
-                    <ProductColor color="black" />
-                  </ProductColorText>
-                  <ProductSize>
-                    <b>Size:</b> 38
-                  </ProductSize>
-                </Details>
-              </ProductDetail>
-              <PriceDetail>
-                <ProductAmountContainer>
-                  <IconButton>
-                    <Add />
-                  </IconButton>
-                  <ProductAmount>1</ProductAmount>
-                  <IconButton>
-                    <Remove />
-                  </IconButton>
-                </ProductAmountContainer>
-                <ProductPrice>$ 120</ProductPrice>
-              </PriceDetail>
-            </Product>
+                  <Details>
+                    <ProductName>
+                      <b>Product:</b> {product.title}
+                    </ProductName>
+                    <ProductId>
+                      <b>ID:</b> {product._id}
+                    </ProductId>
+                    <ProductColorText>
+                      Color:
+                      <ProductColor color={product.color} />
+                    </ProductColorText>
+                    <ProductSize>
+                      <b>Size:</b> {product.size}
+                    </ProductSize>
+                  </Details>
+                </ProductDetail>
+                <PriceDetail>
+                  <ClearButton onClick={handleClear} value={index}>
+                    <Clear />
+                  </ClearButton>
+                  <ProductAmountContainer>
+                    <IconButton sx={{ color: "black" }}>
+                      <Remove />
+                    </IconButton>
+                    <ProductAmount>{product.quantity}</ProductAmount>
+                    <IconButton>
+                      <Add sx={{ color: "black" }} />
+                    </IconButton>
+                  </ProductAmountContainer>
+                  <ProductPrice>
+                    £ {Math.round(product.price * product.quantity * 100) / 100}
+                  </ProductPrice>
+                </PriceDetail>
+              </Product>
+            ))}
           </Info>
-          <Summary>
-            <SummaryTitle>ORDER SUMMARY</SummaryTitle>
-            <SummaryItem>
-              <SummaryItemText>Subtotal</SummaryItemText>
-              <SummaryItemPrice>$ 150</SummaryItemPrice>
-            </SummaryItem>
-            <SummaryItem>
-              <SummaryItemText>Estimated Shipping</SummaryItemText>
-              <SummaryItemPrice>$ 5.90</SummaryItemPrice>
-            </SummaryItem>
-            <SummaryItem>
-              <SummaryItemText>Shipping Discount</SummaryItemText>
-              <SummaryItemPrice>$ -5.90</SummaryItemPrice>
-            </SummaryItem>
-            <SummaryItem>
-              <SummaryItemText type="total">Total</SummaryItemText>
-              <SummaryItemPrice>$ 150</SummaryItemPrice>
-            </SummaryItem>
-            <SummaryButton>CHECKOUT NOW</SummaryButton>
-          </Summary>
+
+          {cart.products.length > 0 && (
+            <Summary>
+              <SummaryTitle>ORDER SUMMARY</SummaryTitle>
+              <SummaryItem>
+                <SummaryItemText>Subtotal</SummaryItemText>
+                <SummaryItemPrice>
+                  £ {Math.round(cart.total * 100) / 100}
+                </SummaryItemPrice>
+              </SummaryItem>
+              <SummaryItem>
+                <SummaryItemText>Estimated Shipping</SummaryItemText>
+                <SummaryItemPrice>£ 4.99</SummaryItemPrice>
+              </SummaryItem>
+              <SummaryItem>
+                <SummaryItemText>Shipping Discount</SummaryItemText>
+                <SummaryItemPrice>
+                  £ {Math.round((cart.total > 50 ? 4.99 : 0) * 100) / 100}
+                </SummaryItemPrice>
+              </SummaryItem>
+              <SummaryItem>
+                <SummaryItemText type="total">Total</SummaryItemText>
+                <SummaryItemPrice>
+                  £
+                  {Math.round(
+                    (cart.total > 50 ? cart.total : cart.total + 4.99) * 100
+                  ) / 100}
+                </SummaryItemPrice>
+              </SummaryItem>
+              <Link to="/checkout">
+                <SummaryButton>CHECKOUT NOW</SummaryButton>
+              </Link>
+            </Summary>
+          )}
         </Bottom>
       </Wrapper>
       <Footer />
