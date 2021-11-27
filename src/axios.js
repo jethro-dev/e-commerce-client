@@ -1,7 +1,12 @@
 import axios from "axios";
 
+const BASE_URL = "https://logo-eshop.herokuapp.com/api/v1";
+const TOKEN = JSON.parse(JSON.parse(localStorage.getItem("persist:root")).user)
+  .currentUser.accessToken;
+
 const instance = axios.create({
-  baseURL: "http://localhost:5000/api/v1",
+  baseURL: BASE_URL,
+  header: { token: `Bearer ${TOKEN}` },
 });
 
 export default instance;
