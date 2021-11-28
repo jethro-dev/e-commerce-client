@@ -14,4 +14,8 @@ This is the client side of the e-commerce web app. The client side is built with
 
 ## Link 🔗
 
+Web App Link:
 [Click Me!](https://logo-eshop.netlify.app/)
+
+Server GitHub Link:
+[Click Me!](https://github.com/obiito01/e-commerce-api)
