@@ -15,7 +15,7 @@ const Checkout = () => {
   useEffect(async () => {
     const res = await axios({
       method: "post",
-      url: "http://localhost:5000/api/v1/payment",
+      url: "https://logo-eshop.herokuapp.com/api/v1/payment",
       data: {
         products,
       },

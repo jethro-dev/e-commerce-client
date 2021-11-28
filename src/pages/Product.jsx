@@ -5,7 +5,7 @@ import styled from "styled-components";
 import { Announcement, Footer, Navbar, Newsletter } from "../components";
 import { mobile } from "../responsive";
 import { useLocation } from "react-router-dom";
-import axios from "../axios";
+import { publicRequest, userRequest } from "../axios";
 import { addProduct } from "../redux/cartRedux";
 import { useDispatch } from "react-redux";
 
@@ -170,7 +170,7 @@ const Product = () => {
   useEffect(() => {
     const getProduct = async () => {
       try {
-        const res = await axios.get(`/products/find/${id}`);
+        const res = await publicRequest.get(`/products/find/${id}`);
         setProduct(res.data);
       } catch (err) {}
     };

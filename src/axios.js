@@ -4,9 +4,13 @@ const BASE_URL = "https://logo-eshop.herokuapp.com/api/v1";
 const TOKEN = JSON.parse(JSON.parse(localStorage.getItem("persist:root"))?.user)
   ?.currentUser?.accessToken;
 
-const instance = axios.create({
+export const publicRequest = axios.create({
   baseURL: BASE_URL,
-  header: { token: `Bearer ${TOKEN}` },
 });
 
-export default instance;
+export const userRequest = axios.create({
+  baseURL: BASE_URL,
+  headers: {
+    token: `Bearer ${TOKEN}`,
+  },
+});
